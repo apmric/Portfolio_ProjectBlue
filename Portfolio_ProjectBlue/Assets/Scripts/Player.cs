@@ -46,6 +46,11 @@ public class Player : MonoBehaviour
         Attack();
     }
 
+    void FixedUpdate()
+    {
+        FreezeRotation();
+    }
+
     void GetInput()
     {
         hAxis = Input.GetAxisRaw("Horizontal");
@@ -88,5 +93,10 @@ public class Player : MonoBehaviour
             anim.SetTrigger("doShot");
             fireDelay = 0;
         }
+    }
+
+    void FreezeRotation()
+    {
+        rigid.angularVelocity = Vector3.zero;
     }
 }
