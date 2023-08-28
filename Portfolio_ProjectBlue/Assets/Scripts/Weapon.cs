@@ -6,6 +6,8 @@ public class Weapon : MonoBehaviour
 {
     public int damage;
     public float rate;
+    public int maxAmmo;
+    public int currentAmmo;
 
     public Transform bulletPos;
     public GameObject bullet;
@@ -15,12 +17,17 @@ public class Weapon : MonoBehaviour
 
     public void Use()
     {
-        StartCoroutine("Shot");
+        if (currentAmmo > 0)
+        {
+            currentAmmo--;
+            StartCoroutine("Shot");
+        }
     }
 
     IEnumerator Shot()
     {
         // ÃÑ¾Ë ¹ß»ç
+        yield return new WaitForSeconds(0.1f);
         GameObject instantBullet = Instantiate(bullet, bulletPos.position, bulletPos.rotation);
         Rigidbody bulletRigid = instantBullet.GetComponent<Rigidbody>();
         bulletRigid.velocity = bulletPos.forward * 50f;

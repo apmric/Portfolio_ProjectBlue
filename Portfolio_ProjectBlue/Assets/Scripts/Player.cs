@@ -1,22 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField]
-    Camera followCamera;
+    public Camera followCamera;
 
-    [SerializeField]
-    float speed;
+    public float speed;
 
     float hAxis;
     float vAxis;
     
     bool wDown;
     bool fDown;
+    bool rDown;
 
     bool isFireReady = true;
+    bool isReload;
 
     Vector3 moveVec;
 
@@ -44,6 +45,8 @@ public class Player : MonoBehaviour
         Turn();
 
         Attack();
+
+        Reload();
     }
 
     void FixedUpdate()
@@ -57,11 +60,17 @@ public class Player : MonoBehaviour
         vAxis = Input.GetAxisRaw("Vertical");
         wDown = Input.GetButton("Walk");
         fDown = Input.GetButton("Fire1");
+        rDown = Input.GetButtonDown("Reload");
     }
 
     void Move()
     {
         moveVec = new Vector3(hAxis, 0, vAxis).normalized;
+
+        if (!isFireReady || isReload)
+        {
+            moveVec = Vector3.zero;
+        }
 
         transform.position += moveVec * speed * (wDown ? 0.3f : 1f) * Time.deltaTime;
 
@@ -71,15 +80,21 @@ public class Player : MonoBehaviour
 
     void Turn()
     {
+        // 키보드에 의한 회전
         transform.LookAt(transform.position + moveVec);
 
-        //Ray ray = followCamera.ScreenPointToRay(Input.mousePosition);
-        //RaycastHit rayHit;
-        //if(Physics.Raycast(ray, out rayHit, 100))
-        //{
-        //    Vector3 nextVec =  rayHit.point - transform.position;
-        //    transform.LookAt(transform.position + nextVec);
-        //}
+        // 마우스에 의한 회전
+        if(fDown && equipWeapon.currentAmmo != 0)
+        {
+            Ray ray = followCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit rayHit;
+            if (Physics.Raycast(ray, out rayHit, 100))
+            {
+                Vector3 nextVec = rayHit.point - transform.position;
+                nextVec.y = 0;
+                transform.LookAt(transform.position + nextVec);
+            }
+        }
     }
 
     void Attack()
@@ -87,12 +102,33 @@ public class Player : MonoBehaviour
         fireDelay += Time.deltaTime;
         isFireReady = equipWeapon.rate < fireDelay;
 
-        if (fDown && isFireReady)
+        if (fDown && isFireReady && equipWeapon.currentAmmo != 0)
         {
             equipWeapon.Use();
             anim.SetTrigger("doShot");
             fireDelay = 0;
         }
+    }
+
+    void Reload()
+    {
+        if (isReload)
+            return;
+
+        if(rDown && isFireReady)
+        {
+            anim.SetTrigger("doReload");
+            isReload = true;
+
+            Invoke("ReloadOut", 2f);
+        }
+    }
+
+    void ReloadOut()
+    {
+        equipWeapon.currentAmmo = equipWeapon.maxAmmo;
+
+        isReload = false;
     }
 
     void FreezeRotation()
