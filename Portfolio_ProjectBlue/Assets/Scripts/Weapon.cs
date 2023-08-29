@@ -27,7 +27,6 @@ public class Weapon : MonoBehaviour
     IEnumerator Shot()
     {
         // ÃÑ¾Ë ¹ß»ç
-        yield return new WaitForSeconds(0.1f);
         GameObject instantBullet = Instantiate(bullet, bulletPos.position, bulletPos.rotation);
         Rigidbody bulletRigid = instantBullet.GetComponent<Rigidbody>();
         bulletRigid.velocity = bulletPos.forward * 50f;

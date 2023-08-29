@@ -84,7 +84,7 @@ public class Player : MonoBehaviour
         transform.LookAt(transform.position + moveVec);
 
         // 마우스에 의한 회전
-        if(fDown && equipWeapon.currentAmmo != 0)
+        if(fDown && equipWeapon.currentAmmo > 0)
         {
             Ray ray = followCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit rayHit;
@@ -102,7 +102,7 @@ public class Player : MonoBehaviour
         fireDelay += Time.deltaTime;
         isFireReady = equipWeapon.rate < fireDelay;
 
-        if (fDown && isFireReady && equipWeapon.currentAmmo != 0)
+        if (fDown && isFireReady && equipWeapon.currentAmmo > 0)
         {
             equipWeapon.Use();
             anim.SetTrigger("doShot");
