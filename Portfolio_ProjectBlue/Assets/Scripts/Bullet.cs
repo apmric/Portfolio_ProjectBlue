@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField]
-    int damage;
+    public int damage;
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -13,7 +12,11 @@ public class Bullet : MonoBehaviour
         {
             Destroy(gameObject, 3);
         }
-        else if (collision.gameObject.tag =="Wall")
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Wall")
         {
             Destroy(gameObject);
         }

@@ -15,11 +15,14 @@ public class Player : MonoBehaviour
     bool wDown;
     bool fDown;
     bool rDown;
+    bool jDown;
 
     bool isFireReady = true;
     bool isReload;
+    bool isDodge;
 
     Vector3 moveVec;
+    Vector3 dodgeVec;
 
     Rigidbody rigid;
     Animator anim;
@@ -39,13 +42,10 @@ public class Player : MonoBehaviour
     void Update()
     {
         GetInput();
-
         Move();
-
+        Dodge();
         Turn();
-
         Attack();
-
         Reload();
     }
 
@@ -59,6 +59,7 @@ public class Player : MonoBehaviour
         hAxis = Input.GetAxisRaw("Horizontal");
         vAxis = Input.GetAxisRaw("Vertical");
         wDown = Input.GetButton("Walk");
+        jDown = Input.GetButton("Jump");
         fDown = Input.GetButton("Fire1");
         rDown = Input.GetButtonDown("Reload");
     }
@@ -66,6 +67,9 @@ public class Player : MonoBehaviour
     void Move()
     {
         moveVec = new Vector3(hAxis, 0, vAxis).normalized;
+
+        if (isDodge)
+            moveVec = dodgeVec;
 
         if (!isFireReady || isReload)
         {
@@ -95,6 +99,25 @@ public class Player : MonoBehaviour
                 transform.LookAt(transform.position + nextVec);
             }
         }
+    }
+
+    void Dodge()
+    {
+        if(jDown && moveVec != Vector3.zero && !isDodge)
+        {
+            dodgeVec = moveVec;
+            speed *= 2;
+            anim.SetTrigger("doDodge");
+            isDodge = true;
+
+            Invoke("DodgeOut", 0.5f);
+        }
+    }
+
+    void DodgeOut()
+    {
+        speed *= 0.5f;
+        isDodge = false;
     }
 
     void Attack()
