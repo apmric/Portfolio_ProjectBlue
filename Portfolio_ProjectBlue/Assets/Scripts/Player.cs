@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     public Camera followCamera;
 
     public float speed;
+    public float health;
 
     float hAxis;
     float vAxis;
@@ -20,12 +21,14 @@ public class Player : MonoBehaviour
     bool isFireReady = true;
     bool isReload;
     bool isDodge;
+    bool isDamage;
 
     Vector3 moveVec;
     Vector3 dodgeVec;
 
     Rigidbody rigid;
     Animator anim;
+    MeshRenderer[] meshs;
 
     Weapon equipWeapon;
     float fireDelay;
@@ -36,6 +39,7 @@ public class Player : MonoBehaviour
         rigid = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         equipWeapon = GetComponentInChildren<Weapon>();
+        meshs = GetComponentsInChildren<MeshRenderer>();
     }
 
     // Update is called once per frame
@@ -71,7 +75,7 @@ public class Player : MonoBehaviour
         if (isDodge)
             moveVec = dodgeVec;
 
-        if (!isFireReady || isReload)
+        if (!isFireReady)
         {
             moveVec = Vector3.zero;
         }
@@ -85,25 +89,26 @@ public class Player : MonoBehaviour
     void Turn()
     {
         // 키보드에 의한 회전
-        transform.LookAt(transform.position + moveVec);
+        this.transform.LookAt(this.transform.position + moveVec);
 
         // 마우스에 의한 회전
         if(fDown && equipWeapon.currentAmmo > 0)
         {
             Ray ray = followCamera.ScreenPointToRay(Input.mousePosition);
+
             RaycastHit rayHit;
             if (Physics.Raycast(ray, out rayHit, 100))
             {
-                Vector3 nextVec = rayHit.point - transform.position;
+                Vector3 nextVec = rayHit.point - this.transform.position;
                 nextVec.y = 0;
-                transform.LookAt(transform.position + nextVec);
+                this.transform.LookAt(this.transform.position + nextVec);
             }
         }
     }
 
     void Dodge()
     {
-        if(jDown && moveVec != Vector3.zero && !isDodge)
+        if(jDown && !isDodge)
         {
             dodgeVec = moveVec;
             speed *= 2;
@@ -157,5 +162,38 @@ public class Player : MonoBehaviour
     void FreezeRotation()
     {
         rigid.angularVelocity = Vector3.zero;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("EnemyBullet"))
+        {
+            Bullet enemyBullet = other.GetComponent<Bullet>();
+            health -= enemyBullet.damage;
+
+            if (other.GetComponent<Rigidbody>() != null)
+                Destroy(other.gameObject);
+
+            StartCoroutine(OnDamage());
+        }
+    }
+
+    IEnumerator OnDamage()
+    {
+        isDamage = true;
+
+        foreach (MeshRenderer mesh in meshs)
+        {
+            mesh.material.color = Color.yellow;
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        isDamage = false;
+
+        foreach (MeshRenderer mesh in meshs)
+        {
+            mesh.material.color = Color.white;
+        }
     }
 }
