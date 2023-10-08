@@ -171,14 +171,16 @@ public class Player : MonoBehaviour
             Bullet enemyBullet = other.GetComponent<Bullet>();
             health -= enemyBullet.damage;
 
-            if (other.GetComponent<Rigidbody>() != null)
-                Destroy(other.gameObject);
+            bool isBossAtk = other.name == "Boss Melee Area";
 
-            StartCoroutine(OnDamage());
+            StartCoroutine(OnDamage(isBossAtk));
         }
+
+        if (other.GetComponent<Rigidbody>() != null)
+            Destroy(other.gameObject);
     }
 
-    IEnumerator OnDamage()
+    IEnumerator OnDamage(bool isBossAtk)
     {
         isDamage = true;
 
@@ -186,6 +188,9 @@ public class Player : MonoBehaviour
         {
             mesh.material.color = Color.yellow;
         }
+
+        if (isBossAtk)
+            rigid.AddForce(this.transform.forward * -25, ForceMode.Impulse);
 
         yield return new WaitForSeconds(1f);
 
@@ -195,5 +200,8 @@ public class Player : MonoBehaviour
         {
             mesh.material.color = Color.white;
         }
+
+        if (isBossAtk)
+            rigid.velocity = Vector3.zero;
     }
 }
