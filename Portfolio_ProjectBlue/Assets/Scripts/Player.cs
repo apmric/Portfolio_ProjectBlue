@@ -1,10 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class Player : MonoBehaviour
 {
+    PlayerInfo Student;
+    public PlayerInfo student
+    {
+        get
+        {
+            return Student;
+        }
+        set 
+        {
+            Student = value;
+
+            //for (int i = 0; i < 2; i++)
+            //{
+            //    student.skills[i].coolTimeUI = skillCoolTimeUIs[i];
+            //}
+        }
+    }
+
+    //public TextMeshProUGUI[] skillCoolTimeUIs = new TextMeshProUGUI[2];
+
     public Camera followCamera;
 
     public float speed;
@@ -15,6 +36,8 @@ public class Player : MonoBehaviour
     
     bool wDown;
     bool fDown;
+    bool s1Down;
+    bool s2Down;
     bool rDown;
     bool jDown;
 
@@ -65,6 +88,8 @@ public class Player : MonoBehaviour
         wDown = Input.GetButton("Walk");
         jDown = Input.GetButton("Jump");
         fDown = Input.GetButton("Fire1");
+        s1Down = Input.GetButton("");
+        s2Down = Input.GetButton("");
         rDown = Input.GetButtonDown("Reload");
     }
 
@@ -136,6 +161,16 @@ public class Player : MonoBehaviour
             anim.SetTrigger("doShot");
             fireDelay = 0;
         }
+    }
+
+    void SKillQ()
+    {
+
+    }
+
+    void SKillE()
+    {
+
     }
 
     void Reload()
