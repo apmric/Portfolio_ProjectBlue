@@ -2535,21 +2535,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1827862558}
   m_CullTransparentMesh: 1
---- !u!114 &1983388679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132147782328661}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fa56e7ce55777745917b6cad4c3b8a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  followCamera: {fileID: 963194227}
-  speed: 15
-  health: 100
 --- !u!95 &1983388680
 Animator:
   serializedVersion: 4
@@ -3826,14 +3811,29 @@ GameObject:
   - component: {fileID: 1983388682}
   - component: {fileID: 1983388681}
   - component: {fileID: 1983388680}
-  - component: {fileID: 1983388679}
+  - component: {fileID: 919132147782328662}
   m_Layer: 7
-  m_Name: Player
+  m_Name: Toki
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &919132147782328662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132147782328661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dd1c00fa80d5b249a2bdb8270a71c9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  followCamera: {fileID: 963194227}
+  speed: 15
+  health: 100
 --- !u!4 &973795875313057308
 Transform:
   m_ObjectHideFlags: 0

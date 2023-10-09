@@ -6,26 +6,6 @@ using UnityEngine.Rendering;
 
 public class Player : MonoBehaviour
 {
-    PlayerInfo Student;
-    public PlayerInfo student
-    {
-        get
-        {
-            return Student;
-        }
-        set 
-        {
-            Student = value;
-
-            //for (int i = 0; i < 2; i++)
-            //{
-            //    student.skills[i].coolTimeUI = skillCoolTimeUIs[i];
-            //}
-        }
-    }
-
-    //public TextMeshProUGUI[] skillCoolTimeUIs = new TextMeshProUGUI[2];
-
     public Camera followCamera;
 
     public float speed;
@@ -33,24 +13,25 @@ public class Player : MonoBehaviour
 
     float hAxis;
     float vAxis;
-    
-    bool wDown;
-    bool fDown;
-    bool s1Down;
-    bool s2Down;
-    bool rDown;
-    bool jDown;
 
-    bool isFireReady = true;
-    bool isReload;
-    bool isDodge;
-    bool isDamage;
+    protected bool wDown;
+    protected bool fDown;
+    protected bool s1Down;
+    protected bool s2Down;
+    protected bool rDown;
+    protected bool jDown;
+
+    protected bool isFireReady = true;
+    protected bool isSkill;
+    protected bool isReload;
+    protected bool isDodge;
+    protected bool isDamage;
 
     Vector3 moveVec;
     Vector3 dodgeVec;
 
     Rigidbody rigid;
-    Animator anim;
+    protected Animator anim;
     MeshRenderer[] meshs;
 
     Weapon equipWeapon;
@@ -73,6 +54,8 @@ public class Player : MonoBehaviour
         Dodge();
         Turn();
         Attack();
+        SkillQ();
+        SkillE();
         Reload();
     }
 
@@ -88,8 +71,8 @@ public class Player : MonoBehaviour
         wDown = Input.GetButton("Walk");
         jDown = Input.GetButton("Jump");
         fDown = Input.GetButton("Fire1");
-        s1Down = Input.GetButton("");
-        s2Down = Input.GetButton("");
+        s1Down = Input.GetButton("SkillQ");
+        s2Down = Input.GetButton("SkillE");
         rDown = Input.GetButtonDown("Reload");
     }
 
@@ -100,7 +83,7 @@ public class Player : MonoBehaviour
         if (isDodge)
             moveVec = dodgeVec;
 
-        if (!isFireReady)
+        if (!isFireReady && fDown && isSkill)
         {
             moveVec = Vector3.zero;
         }
@@ -155,7 +138,7 @@ public class Player : MonoBehaviour
         fireDelay += Time.deltaTime;
         isFireReady = equipWeapon.rate < fireDelay;
 
-        if (fDown && isFireReady && equipWeapon.currentAmmo > 0)
+        if (fDown && isFireReady && equipWeapon.currentAmmo > 0 && !isSkill)
         {
             equipWeapon.Use();
             anim.SetTrigger("doShot");
@@ -163,14 +146,19 @@ public class Player : MonoBehaviour
         }
     }
 
-    void SKillQ()
+    protected virtual void SkillQ()
     {
 
     }
 
-    void SKillE()
+    protected virtual void SkillE()
     {
 
+    }
+
+    protected virtual void SkillOut()
+    {
+        isSkill = false;
     }
 
     void Reload()
