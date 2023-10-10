@@ -48,11 +48,17 @@ public class GameManager : MonoBehaviour
         gamePanel.SetActive(true);
 
         player.gameObject.SetActive(true);
+
+        player = gameObject.AddComponent<Toki>();
     }
 
     void LateUpdate()
     {
         scoreTxt.text = "0";
-        playerHealthTxt.text = player.health.ToString() + " / " + player.maxHealth.ToString();
+        if (player != null)
+        {
+            playerHealthTxt.text = player.currentHp.ToString() + " / " + player.maxHp.ToString();
+            playerAmmoTxt.text = player.equipWeapon.currentAmmo.ToString() + " / " + player.equipWeapon.maxAmmo.ToString();
+        }
     }
 }

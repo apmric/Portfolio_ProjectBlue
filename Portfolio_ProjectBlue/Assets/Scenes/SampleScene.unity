@@ -8210,8 +8210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   followCamera: {fileID: 963194227}
-  speed: 15
-  health: 100
+  equipWeapon: {fileID: 1983388683}
 --- !u!4 &973795875313057308
 Transform:
   m_ObjectHideFlags: 0

@@ -6,11 +6,22 @@ using UnityEngine.Rendering;
 
 public class Player : MonoBehaviour
 {
-    public Camera followCamera;
+    public Player(string name, float maxHp, float speed)
+    {
+        this.name = name;
+        this.maxHp = maxHp;
+        this.currentHp = maxHp;
+        this.speed = speed;
+    }
 
-    public float speed;
-    public float health;
-    public float maxHealth;
+    public string name { get; private set; }
+    public float speed { get; private set; }
+    public float maxHp { get; private set; }
+    public float currentHp { get; private set; }
+
+    public Skill[] skills = new Skill[3];
+
+    public Camera followCamera;
 
     float hAxis;
     float vAxis;
@@ -35,12 +46,14 @@ public class Player : MonoBehaviour
     protected Animator anim;
     MeshRenderer[] meshs;
 
-    Weapon equipWeapon;
+    public Weapon equipWeapon;
     float fireDelay;
 
     // Start is called before the first frame update
     void Awake()
     {
+        Debug.Log(speed);
+
         rigid = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         equipWeapon = GetComponentInChildren<Weapon>();
@@ -193,7 +206,7 @@ public class Player : MonoBehaviour
         if (other.CompareTag("EnemyBullet"))
         {
             Bullet enemyBullet = other.GetComponent<Bullet>();
-            health -= enemyBullet.damage;
+            currentHp -= enemyBullet.damage;
 
             bool isBossAtk = other.name == "Boss Melee Area";
 
