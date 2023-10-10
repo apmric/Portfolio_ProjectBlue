@@ -36,6 +36,7 @@ public class Skill
                 isOn = true;
         }
     }
+
     public TextMeshProUGUI coolTimeUI;
     public bool isOn = true;
 

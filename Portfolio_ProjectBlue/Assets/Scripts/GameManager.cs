@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
 {
     public GameObject menuCam;
     public GameObject gameCam;
-    public Player player;
+    public Player[] player;
     public Boss boss;
     public int stage;
     public float playTime;
@@ -28,8 +28,6 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI enemyATxt;
     public TextMeshProUGUI enemyBTxt;
     public TextMeshProUGUI enemyCTxt;
-    public Image[] coolTimeImg;
-    public TextMeshProUGUI[] coolTimeTxt;
     public RectTransform ultimateBar;
     public RectTransform bossHealthGroup;
     public RectTransform bossHealthBar;
@@ -47,18 +45,14 @@ public class GameManager : MonoBehaviour
         menuPanel.SetActive(false);
         gamePanel.SetActive(true);
 
-        player.gameObject.SetActive(true);
-
-        player = gameObject.AddComponent<Toki>();
+        player[0].gameObject.SetActive(true);
     }
 
     void LateUpdate()
     {
         scoreTxt.text = "0";
-        if (player != null)
-        {
-            playerHealthTxt.text = player.currentHp.ToString() + " / " + player.maxHp.ToString();
-            playerAmmoTxt.text = player.equipWeapon.currentAmmo.ToString() + " / " + player.equipWeapon.maxAmmo.ToString();
-        }
+
+        playerHealthTxt.text = player[0].currentHp.ToString() + " / " + player[0].maxHp.ToString();
+        playerAmmoTxt.text = player[0].equipWeapon.currentAmmo.ToString() + " / " + player[0].equipWeapon.maxAmmo.ToString();
     }
 }

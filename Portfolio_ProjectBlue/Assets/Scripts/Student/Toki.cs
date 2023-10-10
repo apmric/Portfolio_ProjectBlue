@@ -4,15 +4,9 @@ using UnityEngine;
 
 public class Toki : Player
 {
-    public Toki(string name, float maxHp, float speed) : base(name, maxHp, speed)
-    {
-        
-    }
-
     protected override void SkillQ()
     {
         base.SkillQ();
-
     }
 
     protected override void SkillE()

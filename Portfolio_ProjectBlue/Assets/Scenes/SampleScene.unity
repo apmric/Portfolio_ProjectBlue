@@ -1776,7 +1776,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuCam: {fileID: 1302678915}
   gameCam: {fileID: 963194225}
-  player: {fileID: 919132147782328662}
+  player:
+  - {fileID: 919132147782328662}
   boss: {fileID: 1174387047}
   stage: 0
   playTime: 0
@@ -1795,12 +1796,6 @@ MonoBehaviour:
   enemyATxt: {fileID: 1644309641}
   enemyBTxt: {fileID: 1660533171}
   enemyCTxt: {fileID: 1358628040}
-  coolTimeImg:
-  - {fileID: 1671739797}
-  - {fileID: 689519201}
-  coolTimeTxt:
-  - {fileID: 332787805}
-  - {fileID: 2064075707}
   ultimateBar: {fileID: 248762213}
   bossHealthGroup: {fileID: 595349575}
   bossHealthBar: {fileID: 1554710147}
@@ -8209,6 +8204,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dd1c00fa80d5b249a2bdb8270a71c9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 15
+  maxHp: 100
+  currentHp: 100
+  dodgeTime: 0
+  coolTimeImg:
+  - {fileID: 0}
+  - {fileID: 0}
+  coolTimeTxt:
+  - {fileID: 0}
+  - {fileID: 0}
   followCamera: {fileID: 963194227}
   equipWeapon: {fileID: 1983388683}
 --- !u!4 &973795875313057308

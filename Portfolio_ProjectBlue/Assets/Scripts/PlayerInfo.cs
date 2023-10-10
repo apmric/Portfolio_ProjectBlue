@@ -16,14 +16,4 @@ public class PlayerInfo
     public float maxHp { get; private set; }
 
     public Skill[] skills = new Skill[2];
-
-    public virtual string SkillQ()
-    {
-        return "Q스킬";
-    }
-
-    public virtual string SkillE()
-    {
-        return "E스킬";
-    }
 }

@@ -2,24 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Rendering;
 
 public class Player : MonoBehaviour
 {
-    public Player(string name, float maxHp, float speed)
-    {
-        this.name = name;
-        this.maxHp = maxHp;
-        this.currentHp = maxHp;
-        this.speed = speed;
-    }
+    public float speed;
+    public float maxHp;
+    public float currentHp;
+    public float dodgeTime;
 
-    public string name { get; private set; }
-    public float speed { get; private set; }
-    public float maxHp { get; private set; }
-    public float currentHp { get; private set; }
-
-    public Skill[] skills = new Skill[3];
+    public Skill[] skills = new Skill[2];
+    public Image[] coolTimeImg = new Image[2];
+    public TextMeshProUGUI[] coolTimeTxt = new TextMeshProUGUI[2];
 
     public Camera followCamera;
 
@@ -52,8 +47,6 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        Debug.Log(speed);
-
         rigid = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         equipWeapon = GetComponentInChildren<Weapon>();
