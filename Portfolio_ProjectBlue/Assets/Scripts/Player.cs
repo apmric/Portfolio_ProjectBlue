@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
 
     public float speed;
     public float health;
+    public float maxHealth;
 
     float hAxis;
     float vAxis;
@@ -38,7 +39,7 @@ public class Player : MonoBehaviour
     float fireDelay;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         rigid = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
