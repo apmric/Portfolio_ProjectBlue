@@ -4,19 +4,21 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
+using System;
+using System.Reflection;
 
 public class Player : MonoBehaviour
 {
-    public float speed;
-    public float maxHp;
     public float currentHp;
+    public float maxHp;
+    public float speed;
     public float dodgeTime;
 
     public Skill[] skills = new Skill[2];
-    public Image[] coolTimeImg = new Image[2];
-    public TextMeshProUGUI[] coolTimeTxt = new TextMeshProUGUI[2];
 
-    public Camera followCamera;
+    Image[] skillCoolTimeImgs = new Image[2];
+    TextMeshProUGUI[] skillCoolTimeUIs = new TextMeshProUGUI[2];
+    Camera followCamera;
 
     float hAxis;
     float vAxis;
@@ -39,22 +41,37 @@ public class Player : MonoBehaviour
 
     Rigidbody rigid;
     protected Animator anim;
-    MeshRenderer[] meshs;
+    protected MeshRenderer[] meshs;
+    protected Transform[] transforms;
 
     public Weapon equipWeapon;
     float fireDelay;
 
     // Start is called before the first frame update
-    void Awake()
+    protected virtual void Awake()
     {
         rigid = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         equipWeapon = GetComponentInChildren<Weapon>();
         meshs = GetComponentsInChildren<MeshRenderer>();
+        transforms = GetComponentsInChildren<Transform>();
+
+        followCamera = GameManager.instance.gameCam.gameObject.GetComponent<Camera>();
+        skillCoolTimeUIs = GameManager.instance.coolTimeTxt;
+        skillCoolTimeImgs = GameManager.instance.coolTimeImg;
+    }
+
+    private void Start()
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            skills[i].coolTimeImage = skillCoolTimeImgs[i];
+            skills[i].coolTimeUI = skillCoolTimeUIs[i];
+        }
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         GetInput();
         Move();
@@ -64,6 +81,14 @@ public class Player : MonoBehaviour
         SkillQ();
         SkillE();
         Reload();
+
+        for (int i = 0; i < 2; i++)
+        {
+            if (!skills[i].isOn)
+            {
+                skills[i].remainTime -= Time.deltaTime; // 프레임과 프레임 사이 걸린 시간
+            }
+        }
     }
 
     void FixedUpdate()
@@ -75,7 +100,6 @@ public class Player : MonoBehaviour
     {
         hAxis = Input.GetAxisRaw("Horizontal");
         vAxis = Input.GetAxisRaw("Vertical");
-        wDown = Input.GetButton("Walk");
         jDown = Input.GetButton("Jump");
         fDown = Input.GetButton("Fire1");
         s1Down = Input.GetButton("SkillQ");
@@ -90,7 +114,7 @@ public class Player : MonoBehaviour
         if (isDodge)
             moveVec = dodgeVec;
 
-        if (!isFireReady && fDown && isSkill)
+        if (!isFireReady || isSkill)
         {
             moveVec = Vector3.zero;
         }
@@ -98,7 +122,6 @@ public class Player : MonoBehaviour
         transform.position += moveVec * speed * (wDown ? 0.3f : 1f) * Time.deltaTime;
 
         anim.SetBool("isRun", moveVec != Vector3.zero);
-        anim.SetBool("isWalk", wDown);
     }
 
     void Turn()
@@ -123,8 +146,10 @@ public class Player : MonoBehaviour
 
     void Dodge()
     {
-        if(jDown && !isDodge)
+        if(jDown && !isDodge && skills[0].isOn)
         {
+            UseSkill(0);
+
             dodgeVec = moveVec;
             speed *= 2;
             anim.SetTrigger("doDodge");
@@ -166,6 +191,14 @@ public class Player : MonoBehaviour
     protected virtual void SkillOut()
     {
         isSkill = false;
+    }
+
+    public void UseSkill(int index)
+    {
+        if (!skills[index].isOn)
+            return;
+
+        skills[index].Use();
     }
 
     void Reload()

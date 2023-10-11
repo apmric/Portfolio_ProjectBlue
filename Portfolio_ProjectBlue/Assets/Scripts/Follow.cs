@@ -4,14 +4,13 @@ using UnityEngine;
 
 public class Follow : MonoBehaviour
 {
-    [SerializeField]
-    Transform target;
-    [SerializeField]
-    Vector3 offset;
+    public Transform target;
+    public Vector3 offset;
 
     // Update is called once per frame
     void Update()
     {
+        target = GameManager.instance.player.transform;
         transform.position = target.position + offset;
     }
 }

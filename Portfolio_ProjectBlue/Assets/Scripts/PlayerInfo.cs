@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerInfo
 {
-    public PlayerInfo(string name, float maxHp)
+    public PlayerInfo(string name, float maxHp, float speed)
     {
         this.name = name;
         this.maxHp = maxHp;
@@ -14,6 +14,7 @@ public class PlayerInfo
     public string name { get; private set; }
     public float currentHp;
     public float maxHp { get; private set; }
+    public float speed { get; private set; }
 
     public Skill[] skills = new Skill[2];
 }
