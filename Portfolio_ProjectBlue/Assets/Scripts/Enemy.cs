@@ -14,13 +14,15 @@ public class Enemy : MonoBehaviour
     public Type enemyType;
     public int maxHealth;
     public int curHealth;
+    public int score;
+    public float ulGauge;
     public Transform target;
     public BoxCollider meleeArea;
     public GameObject bullet;
     public bool isChase;
     public bool isAttack;
     public bool isDead;
-
+    public GameObject[] coins;
     public Rigidbody rigid;
     public BoxCollider boxCollider;
     public MeshRenderer[] meshs;
@@ -70,12 +72,12 @@ public class Enemy : MonoBehaviour
 
     IEnumerator OnDamage(Vector3 reactVec)
     {
-        foreach(MeshRenderer mesh in meshs)
+        foreach (MeshRenderer mesh in meshs)
             mesh.material.color = Color.red;
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.01f);
 
-        if(curHealth > 0)
+        if (curHealth > 0)
         {
             foreach (MeshRenderer mesh in meshs)
                 mesh.material.color = Color.white;
@@ -91,13 +93,33 @@ public class Enemy : MonoBehaviour
             nav.enabled = false;
             anim.SetTrigger("doDie");
 
+            GameManager.instance.player.score += score;
+            GameManager.instance.player.ulGauge += ulGauge;
+            int ranCoin = Random.Range(0, 3);
+            Instantiate(coins[ranCoin], this.transform.position, Quaternion.identity);
+
+            switch(enemyType)
+            {
+                case Type.A:
+                    GameManager.instance.enemyCntA--;
+                    break; 
+                case Type.B:
+                    GameManager.instance.enemyCntB--;
+                    break;
+                case Type.C:
+                    GameManager.instance.enemyCntC--;
+                    break;
+                case Type.D:
+                    GameManager.instance.enemyCntD--;
+                    break;
+            }
+
             reactVec = reactVec.normalized;
             reactVec += Vector3.up;
 
             rigid.AddForce(reactVec * 5, ForceMode.Impulse);
 
-            if (enemyType != Type.D)
-                Destroy(gameObject, 4);
+            Destroy(gameObject, 4);
         }
     }
 

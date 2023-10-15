@@ -1,10 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Toki : Player
 {
-    public RuntimeAnimatorController transfrom;
+    // 변신할 때 쓰이는 에니메이션 컨트롤러
+    public RuntimeAnimatorController[] transfrom;
+    // 변신할 때 쓰이는 무기
+    public Weapon[] transWeapon;
+    // 변신 했는지, 안했는지
+    bool isTransfrom;
+    bool isUseUltimate;
 
     protected override void Awake()
     {
@@ -17,9 +24,16 @@ public class Toki : Player
     {
         base.SkillQ();
 
-        if (s1Down)
+        if (s1Down && isUltimateReady & !isUseUltimate && !isDead)
         {
-            anim.SetTrigger("doSkillQ");
+            exSkillSound.Play();
+
+            isTransfrom = true;
+            isUseUltimate = true;
+            maxHp = 1000;
+            currentHp = 1000;
+            equipWeapon.currentAmmo = 99;
+            equipWeapon.maxAmmo = 99;
 
             foreach (Transform mesh in transforms)
             {
@@ -29,9 +43,20 @@ public class Toki : Player
                     mesh.GetComponent<SkinnedMeshRenderer>().enabled = true;
             }
 
-            anim.runtimeAnimatorController = transfrom;
-
-            //Invoke("SkillOut", 3f);
+            equipWeapon = transWeapon[Convert.ToInt32(isTransfrom)];
+            anim.runtimeAnimatorController = transfrom[Convert.ToInt32(isTransfrom)];
+        }
+        
+        if (isUseUltimate)
+        {
+            if (ulGauge > 0)
+            {
+                ulGauge -= Time.deltaTime * 10f;
+            }
+            else if (ulGauge <= 0)
+            {
+                exSkillOut();
+            }
         }
     }
 
@@ -39,12 +64,19 @@ public class Toki : Player
     {
         base.SkillE();
 
-        if(s2Down && skills[1].isOn)
+        if(s2Down && skills[1].isOn && !isUseUltimate && !isDead)
         {
+            commonSkillSound.Play();
+
             UseSkill(1);
 
             isSkill = true;
             anim.SetTrigger("doSkillE");
+
+            Bullet bullet = equipWeapon.bullet.GetComponent<Bullet>();
+            bullet.damage = 14;
+
+            equipWeapon.currentAmmo = 30;
 
             StartCoroutine(SkillShot());
 
@@ -55,6 +87,21 @@ public class Toki : Player
     protected override void SkillOut()
     {
         base.SkillOut();
+        Bullet bullet = equipWeapon.bullet.GetComponent<Bullet>();
+        bullet.damage = 7;
+    }
+
+    void exSkillOut()
+    {
+        isTransfrom = false;
+        isUltimateReady = false;
+        isUseUltimate = false;
+        equipWeapon = transWeapon[Convert.ToInt32(isTransfrom)];
+
+        maxHp = 100;
+        currentHp = 100;
+        equipWeapon.currentAmmo = 30;
+        equipWeapon.maxAmmo = 30;
 
         foreach (Transform mesh in transforms)
         {
@@ -62,7 +109,10 @@ public class Toki : Player
                 mesh.GetComponent<SkinnedMeshRenderer>().enabled = true;
             if (mesh.name == "CH0187_B_Body")
                 mesh.GetComponent<SkinnedMeshRenderer>().enabled = false;
+
         }
+
+        anim.runtimeAnimatorController = transfrom[Convert.ToInt32(isTransfrom)];
     }
 
     IEnumerator SkillShot()
@@ -73,7 +123,7 @@ public class Toki : Player
         {
             Debug.Log(isSkill);
             equipWeapon.Use();
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(0.1f);
         }
     }
 }

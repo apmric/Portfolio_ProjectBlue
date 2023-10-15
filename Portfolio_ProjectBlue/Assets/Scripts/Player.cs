@@ -3,19 +3,35 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Rendering;
-using System;
-using System.Reflection;
 
 public class Player : MonoBehaviour
 {
+    [Header("# PlayerInfo")]
     public float currentHp;
     public float maxHp;
+    public float ulGauge;
+    public float ulMaxGauge;
     public float speed;
     public float dodgeTime;
+    public Weapon equipWeapon;
+    float fireDelay;
 
+    [Header("# PlayerSound")]
+    public AudioSource shotSound;
+    public AudioSource battleInSound;
+    public AudioSource damageSound;
+    public AudioSource moveSound;
+    public AudioSource retireSound;
+    public AudioSource commonSkillSound;
+    public AudioSource exSkillSound;
+
+    [Header("# UI")]
+    public int score;
+    public int coin;
+    public int maxCoin;
+
+    [Header("# PlayerSkill")]
     public Skill[] skills = new Skill[2];
-
     Image[] skillCoolTimeImgs = new Image[2];
     TextMeshProUGUI[] skillCoolTimeUIs = new TextMeshProUGUI[2];
     Camera followCamera;
@@ -31,21 +47,20 @@ public class Player : MonoBehaviour
     protected bool jDown;
 
     protected bool isFireReady = true;
+    protected bool isUltimateReady;
     protected bool isSkill;
     protected bool isReload;
     protected bool isDodge;
     protected bool isDamage;
+    protected bool isDead;
 
     Vector3 moveVec;
     Vector3 dodgeVec;
 
     Rigidbody rigid;
     protected Animator anim;
-    protected MeshRenderer[] meshs;
+    protected SkinnedMeshRenderer[] meshs;
     protected Transform[] transforms;
-
-    public Weapon equipWeapon;
-    float fireDelay;
 
     // Start is called before the first frame update
     protected virtual void Awake()
@@ -53,12 +68,14 @@ public class Player : MonoBehaviour
         rigid = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         equipWeapon = GetComponentInChildren<Weapon>();
-        meshs = GetComponentsInChildren<MeshRenderer>();
+        meshs = GetComponentsInChildren<SkinnedMeshRenderer>();
         transforms = GetComponentsInChildren<Transform>();
 
         followCamera = GameManager.instance.gameCam.gameObject.GetComponent<Camera>();
         skillCoolTimeUIs = GameManager.instance.coolTimeTxt;
         skillCoolTimeImgs = GameManager.instance.coolTimeImg;
+
+        PlayerPrefs.SetInt("MaxScore", score);
     }
 
     private void Start()
@@ -114,7 +131,7 @@ public class Player : MonoBehaviour
         if (isDodge)
             moveVec = dodgeVec;
 
-        if (!isFireReady || isSkill)
+        if (!isFireReady || isSkill || isDead)
         {
             moveVec = Vector3.zero;
         }
@@ -130,7 +147,7 @@ public class Player : MonoBehaviour
         this.transform.LookAt(this.transform.position + moveVec);
 
         // 마우스에 의한 회전
-        if(fDown && equipWeapon.currentAmmo > 0)
+        if(fDown && equipWeapon.currentAmmo > 0 && !isDead)
         {
             Ray ray = followCamera.ScreenPointToRay(Input.mousePosition);
 
@@ -146,7 +163,7 @@ public class Player : MonoBehaviour
 
     void Dodge()
     {
-        if(jDown && !isDodge && skills[0].isOn)
+        if(jDown && !isDodge && skills[0].isOn && !isDead)
         {
             UseSkill(0);
 
@@ -170,9 +187,10 @@ public class Player : MonoBehaviour
         fireDelay += Time.deltaTime;
         isFireReady = equipWeapon.rate < fireDelay;
 
-        if (fDown && isFireReady && equipWeapon.currentAmmo > 0 && !isSkill)
+        if (fDown && isFireReady && equipWeapon.currentAmmo > 0 && !isSkill && !isDead)
         {
             equipWeapon.Use();
+            shotSound.Play();
             anim.SetTrigger("doShot");
             fireDelay = 0;
         }
@@ -180,7 +198,17 @@ public class Player : MonoBehaviour
 
     protected virtual void SkillQ()
     {
+        if (ulGauge < ulMaxGauge)
+        {
+            GameManager.instance.ultimateBar.localScale = new Vector3(1, (float)(ulGauge / ulMaxGauge), 1);
+        }
 
+        if (ulGauge >= ulMaxGauge)
+        {
+            isUltimateReady = true;
+            ulGauge = 100f;
+            GameManager.instance.ultimateBar.localScale = new Vector3(1, 1, 1);
+        }
     }
 
     protected virtual void SkillE()
@@ -206,7 +234,7 @@ public class Player : MonoBehaviour
         if (isReload)
             return;
 
-        if(rDown && isFireReady)
+        if(rDown && isFireReady && !isDead)
         {
             anim.SetTrigger("doReload");
             isReload = true;
@@ -229,8 +257,29 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if(other.CompareTag("Item"))
+        {
+            Item item = other.GetComponent<Item>();
+            switch(item.type)
+            {
+                case Item.Type.Heart:
+                    currentHp += item.value;
+                    if (currentHp > maxHp)
+                        currentHp = maxHp;
+                    break;
+                case Item.Type.Coin:
+                    coin += item.value;
+                    if (coin > maxCoin)
+                        coin = maxCoin;
+                    break;
+            }
+            Destroy(other.gameObject);
+        }
+
         if (other.CompareTag("EnemyBullet"))
         {
+            damageSound.Play();
+
             Bullet enemyBullet = other.GetComponent<Bullet>();
             currentHp -= enemyBullet.damage;
 
@@ -247,24 +296,35 @@ public class Player : MonoBehaviour
     {
         isDamage = true;
 
-        foreach (MeshRenderer mesh in meshs)
+        foreach (SkinnedMeshRenderer mesh in meshs)
         {
-            mesh.material.color = Color.yellow;
+            mesh.material.color = Color.gray;
         }
 
         if (isBossAtk)
             rigid.AddForce(this.transform.forward * -25, ForceMode.Impulse);
 
+        if (currentHp <= 0 && !isDead)
+            OnDie();
+
         yield return new WaitForSeconds(1f);
 
         isDamage = false;
 
-        foreach (MeshRenderer mesh in meshs)
+        foreach (SkinnedMeshRenderer mesh in meshs)
         {
             mesh.material.color = Color.white;
         }
 
         if (isBossAtk)
             rigid.velocity = Vector3.zero;
+    }
+
+    void OnDie()
+    {
+        retireSound.Play();
+        anim.SetTrigger("doDie");
+        isDead = true;
+        GameManager.instance.GameOver();
     }
 }
