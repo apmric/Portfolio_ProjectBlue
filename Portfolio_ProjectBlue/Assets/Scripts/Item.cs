@@ -15,5 +15,10 @@ public class Item : MonoBehaviour
     void Update()
     {
         this.transform.Rotate(Vector3.up * 20f* Time.deltaTime);
+
+        if (!GameManager.instance.isBattle)
+        {
+            this.transform.position = Vector3.zero;
+        }
     }
 }

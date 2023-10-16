@@ -24,14 +24,14 @@ public class Toki : Player
     {
         base.SkillQ();
 
-        if (s1Down && isUltimateReady & !isUseUltimate && !isDead)
+        if (s1Down && isUltimateReady & !isUseUltimate && !isDead && !isShop)
         {
             exSkillSound.Play();
 
             isTransfrom = true;
             isUseUltimate = true;
-            maxHp = 1000;
-            currentHp = 1000;
+            maxHp = 200;
+            currentHp = 200;
             equipWeapon.currentAmmo = 99;
             equipWeapon.maxAmmo = 99;
 
@@ -64,7 +64,7 @@ public class Toki : Player
     {
         base.SkillE();
 
-        if(s2Down && skills[1].isOn && !isUseUltimate && !isDead)
+        if(s2Down && skills[1].isOn && !isUseUltimate && !isDead && !isShop)
         {
             commonSkillSound.Play();
 

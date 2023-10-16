@@ -72,8 +72,6 @@ public class PoolManager : MonoBehaviour
 
     public GameObject GetPool(GameObject objs)
     {
-        Debug.Log(objs.name);
-
         int index = 0;
 
         switch(objs.name)

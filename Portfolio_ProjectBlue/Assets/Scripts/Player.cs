@@ -24,6 +24,7 @@ public class Player : MonoBehaviour
     public AudioSource retireSound;
     public AudioSource commonSkillSound;
     public AudioSource exSkillSound;
+    public AudioSource reloadSound;
 
     [Header("# UI")]
     public int score;
@@ -52,6 +53,7 @@ public class Player : MonoBehaviour
     protected bool isDodge;
     protected bool isDamage;
     protected bool isDead;
+    public bool isShop;
 
     Vector3 moveVec;
     Vector3 dodgeVec;
@@ -128,7 +130,7 @@ public class Player : MonoBehaviour
         if (isDodge)
             moveVec = dodgeVec;
 
-        if (!isFireReady || isSkill || isDead)
+        if (!isFireReady || isSkill || isDead || isShop)
         {
             moveVec = Vector3.zero;
         }
@@ -144,7 +146,7 @@ public class Player : MonoBehaviour
         this.transform.LookAt(this.transform.position + moveVec);
 
         // 마우스에 의한 회전
-        if(fDown && equipWeapon.currentAmmo > 0 && !isDead)
+        if(fDown && equipWeapon.currentAmmo > 0 && !isDead && !isShop)
         {
             Ray ray = followCamera.ScreenPointToRay(Input.mousePosition);
 
@@ -160,7 +162,7 @@ public class Player : MonoBehaviour
 
     void Dodge()
     {
-        if(jDown && !isDodge && skills[0].isOn && !isDead)
+        if(jDown && moveVec != Vector3.zero && !isDodge && skills[0].isOn && !isDead && !isShop)
         {
             UseSkill(0);
 
@@ -184,7 +186,7 @@ public class Player : MonoBehaviour
         fireDelay += Time.deltaTime;
         isFireReady = equipWeapon.rate < fireDelay;
 
-        if (fDown && isFireReady && equipWeapon.currentAmmo > 0 && !isSkill && !isDead)
+        if (fDown && isFireReady && equipWeapon.currentAmmo > 0 && !isSkill && !isDead && !isShop)
         {
             equipWeapon.Use();
             shotSound.Play();
@@ -233,6 +235,8 @@ public class Player : MonoBehaviour
 
         if(rDown && isFireReady && !isDead)
         {
+            reloadSound.Play();
+
             anim.SetTrigger("doReload");
             isReload = true;
 
@@ -286,7 +290,22 @@ public class Player : MonoBehaviour
         }
 
         if (other.GetComponent<Rigidbody>() != null)
-                GameManager.instance.poolManager.SetPool(PoolFlag.enemyCMissile, other.gameObject);
+        {
+            Debug.Log(other.gameObject.name);
+
+            switch(other.gameObject.name)
+            {
+                case "BossMissile(Clone)":
+                    GameManager.instance.poolManager.SetPool(PoolFlag.bossMissile, other.gameObject);
+                    break;
+                case "Boss Rock(Clone)":
+                    GameManager.instance.poolManager.SetPool(PoolFlag.bossRock, other.gameObject);
+                    break;
+                case "Missile(Clone)":
+                    GameManager.instance.poolManager.SetPool(PoolFlag.enemyCMissile, other.gameObject);
+                    break;
+            }
+        }      
     }
 
     IEnumerator OnDamage(bool isBossAtk)

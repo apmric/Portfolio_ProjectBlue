@@ -21,12 +21,6 @@ public class GameManager : MonoBehaviour
     public Player player;
     public Transform respown;
 
-    [Header("# Stage")]
-    public GameObject startZone;
-    public int stage;
-    public float playTime;
-    public bool isBattle;
-
     [Header("# Enemy")]
     public Transform[] enemyZones;
     public GameObject[] enemies;
@@ -37,11 +31,22 @@ public class GameManager : MonoBehaviour
     public int enemyCntD;
     public Boss boss;
 
+    [Header("# Stage")]
+    public GameObject startZone;
+    public int stage;
+    public float playTime;
+    public bool isBattle;
+
+    [Header("# Shop")]
+    public int[] itemPrice;
+    public GameObject shopText;
+
     [Header("# Panel")]
     public GameObject menuPanel;
     public GameObject studentPanel;
     public GameObject gamePanel;
     public GameObject overPanel;
+    public GameObject clearPanel;
     public TextMeshProUGUI maxScoreTxt;
     public TextMeshProUGUI scoreTxt;
     public TextMeshProUGUI stageTxt;
@@ -57,8 +62,13 @@ public class GameManager : MonoBehaviour
     public RectTransform ultimateBar;
     public RectTransform bossHealthGroup;
     public RectTransform bossHealthBar;
+    public RectTransform shopUiGroup;
     public TextMeshProUGUI curScoreText;
     public TextMeshProUGUI bestScoreText;
+
+    [Header("# Sound")]
+    public AudioSource menuSound;
+    public AudioSource backGroundSound;
 
     void Awake()
     {
@@ -126,6 +136,9 @@ public class GameManager : MonoBehaviour
         gameCam.SetActive(true);
         gamePanel.SetActive(true);
         player.gameObject.SetActive(true);
+
+        menuSound.Stop();
+        backGroundSound.Play();
     }
 
     void Update()
@@ -190,6 +203,7 @@ public class GameManager : MonoBehaviour
             zone.gameObject.SetActive(false);
 
         startZone.SetActive(true);
+        ShopEnter();
 
         isBattle = false;
         stage++;
@@ -231,13 +245,16 @@ public class GameManager : MonoBehaviour
             while (enemyList.Count > 0)
             {
                 int ranZone = Random.Range(0, 4);
+
                 GameObject instantEnemy = poolManager.GetPool(enemies[enemyList[0]]);
-                Debug.Log(enemyZones[ranZone].position);
                 instantEnemy.transform.position = enemyZones[ranZone].position;
                 instantEnemy.transform.rotation = enemyZones[ranZone].rotation;
+
                 Enemy enemy = instantEnemy.GetComponent<Enemy>();
                 enemy.target = player.transform;
+
                 enemyList.RemoveAt(0);
+
                 yield return new WaitForSeconds(5f);
             }
         }
@@ -247,8 +264,51 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
+        clearPanel.gameObject.SetActive(true);
+
         yield return new WaitForSeconds(4f);
         boss = null;
+        clearPanel.gameObject.SetActive(false);
         StageEnd();
+    }
+
+    public void ShopEnter()
+    {
+        shopUiGroup.anchoredPosition = Vector3.zero;
+        player.isShop = true;
+    }
+
+    public void ShopExit()
+    {
+        shopUiGroup.anchoredPosition = Vector3.down * 1000;
+        player.isShop = false;
+    }
+
+    public void ShopBuy(int index)
+    {
+        int price = itemPrice[index];
+        if (price > player.coin) 
+        {
+            shopText.gameObject.SetActive(true);
+            return;
+        }
+
+        shopText.gameObject.SetActive(false);
+
+        player.coin -= price;
+
+        switch (index)
+        {
+            case 0:
+                player.currentHp = 100;
+                break;
+            case 1:
+                Bullet bullet = player.equipWeapon.bullet.GetComponent<Bullet>();
+                bullet.damage += 7;
+                break;
+            case 2:
+                player.ulGauge = 100;
+                break;
+        }
     }
 }
