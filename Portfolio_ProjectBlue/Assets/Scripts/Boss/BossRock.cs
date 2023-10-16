@@ -16,6 +16,12 @@ public class BossRock : Bullet
         StartCoroutine(GainPower());
     }
 
+    void OnEnable()
+    {
+        StartCoroutine(GainPowerTimer());
+        StartCoroutine(GainPower());
+    }
+
     IEnumerator GainPowerTimer()
     {
         yield return new WaitForSeconds(2.2f);

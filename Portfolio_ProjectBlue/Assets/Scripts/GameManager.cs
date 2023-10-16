@@ -8,25 +8,36 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+
+    [Header("# Manager")]
+    public PoolManager poolManager;
+
+    [Header("# Camera")]
     public GameObject menuCam;
     public GameObject gameCam;
+
+    [Header("# Player")]
     public GameObject[] studentPrefabs;
     public Player player;
     public Transform respown;
-    public Boss boss;
+
+    [Header("# Stage")]
     public GameObject startZone;
     public int stage;
     public float playTime;
     public bool isBattle;
+
+    [Header("# Enemy")]
+    public Transform[] enemyZones;
+    public GameObject[] enemies;
+    public List<int> enemyList;
     public int enemyCntA;
     public int enemyCntB;
     public int enemyCntC;
     public int enemyCntD;
+    public Boss boss;
 
-    public Transform[] enemyZones;
-    public GameObject[] enemies;
-    public List<int> enemyList;
-
+    [Header("# Panel")]
     public GameObject menuPanel;
     public GameObject studentPanel;
     public GameObject gamePanel;
@@ -48,7 +59,6 @@ public class GameManager : MonoBehaviour
     public RectTransform bossHealthBar;
     public TextMeshProUGUI curScoreText;
     public TextMeshProUGUI bestScoreText;
-
 
     void Awake()
     {
@@ -190,7 +200,9 @@ public class GameManager : MonoBehaviour
         if (stage % 5 == 0)
         {
             enemyCntD++;
-            GameObject instantEnemy = Instantiate(enemies[3], enemyZones[0].position, enemyZones[0].rotation);
+            GameObject instantEnemy = poolManager.GetPool(enemies[3]);
+            instantEnemy.transform.position = enemyZones[0].position;
+            instantEnemy.transform.rotation = enemyZones[0].rotation;
             Enemy enemy = instantEnemy.GetComponent<Enemy>();
             enemy.target = player.transform;
             boss = instantEnemy.GetComponent<Boss>();
@@ -219,7 +231,10 @@ public class GameManager : MonoBehaviour
             while (enemyList.Count > 0)
             {
                 int ranZone = Random.Range(0, 4);
-                GameObject instantEnemy = Instantiate(enemies[enemyList[0]], enemyZones[ranZone].position, enemyZones[ranZone].rotation);
+                GameObject instantEnemy = poolManager.GetPool(enemies[enemyList[0]]);
+                Debug.Log(enemyZones[ranZone].position);
+                instantEnemy.transform.position = enemyZones[ranZone].position;
+                instantEnemy.transform.rotation = enemyZones[ranZone].rotation;
                 Enemy enemy = instantEnemy.GetComponent<Enemy>();
                 enemy.target = player.transform;
                 enemyList.RemoveAt(0);

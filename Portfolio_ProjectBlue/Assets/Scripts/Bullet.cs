@@ -12,7 +12,18 @@ public class Bullet : MonoBehaviour
     {
         if (!isRock && collision.gameObject.tag == "Floor")
         {
-            Destroy(gameObject, 3);
+            switch(this.name)
+            {
+                case "Bullet(Clone)":
+                    GameManager.instance.poolManager.SetPool(PoolFlag.bullet, this.gameObject);
+                    break;
+                case "Bullet Case(Clone)":
+                    GameManager.instance.poolManager.SetPool(PoolFlag.bulletCase, this.gameObject);
+                    break;
+                case "Missile(Clone)":
+                    GameManager.instance.poolManager.SetPool(PoolFlag.enemyCMissile, this.gameObject);
+                    break;
+            }
         }
     }
 
@@ -20,7 +31,21 @@ public class Bullet : MonoBehaviour
     {
         if (!isMelee && other.gameObject.tag == "Wall")
         {
-            Destroy(gameObject);
+            switch (this.name)
+            {
+                case "Bullet(Clone)":
+                    GameManager.instance.poolManager.SetPool(PoolFlag.bullet, this.gameObject);
+                    break;
+                case "Bullet Case(Clone)":
+                    GameManager.instance.poolManager.SetPool(PoolFlag.bulletCase, this.gameObject);
+                    break;
+                case "Missile(Clone)":
+                    GameManager.instance.poolManager.SetPool(PoolFlag.enemyCMissile, this.gameObject);
+                    break;
+                case "Boss Rock(Clone)":
+                    GameManager.instance.poolManager.SetPool(PoolFlag.bossRock, this.gameObject);
+                    break;
+            }
         }
     }
 }

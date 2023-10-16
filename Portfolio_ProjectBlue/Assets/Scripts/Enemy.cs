@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -41,6 +43,12 @@ public class Enemy : MonoBehaviour
             Invoke("ChaseStart", 2);
     }
 
+    void OnEnable()
+    {
+        if (enemyType != Type.D)
+            Invoke("ChaseStart", 2);
+    }
+
     void Update()
     {
         if (nav.enabled && enemyType != Type.D)
@@ -58,13 +66,13 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Bullet")
+        if (other.CompareTag("Bullet"))
         {
             Bullet bullet = other.GetComponent<Bullet>();
             curHealth -= bullet.damage;
             Vector3 reactVec = this.transform.position - other.transform.position;
 
-            Destroy(other.gameObject);
+            GameManager.instance.poolManager.SetPool(PoolFlag.bullet, other.gameObject);
 
             StartCoroutine(OnDamage(reactVec));
         }
@@ -95,8 +103,11 @@ public class Enemy : MonoBehaviour
 
             GameManager.instance.player.score += score;
             GameManager.instance.player.ulGauge += ulGauge;
+
             int ranCoin = Random.Range(0, 3);
-            Instantiate(coins[ranCoin], this.transform.position, Quaternion.identity);
+            GameObject instantCoin = GameManager.instance.poolManager.GetPool(coins[ranCoin]);
+            instantCoin.transform.position = this.transform.position;
+            instantCoin.transform.rotation = Quaternion.identity;
 
             switch(enemyType)
             {
@@ -119,7 +130,26 @@ public class Enemy : MonoBehaviour
 
             rigid.AddForce(reactVec * 5, ForceMode.Impulse);
 
-            Destroy(gameObject, 4);
+            Invoke("ReturnObject", 4);
+        }
+    }
+
+    void ReturnObject()
+    {
+        switch (enemyType)
+        {
+            case Type.A:
+                GameManager.instance.poolManager.SetPool(PoolFlag.enemyA, this.gameObject);
+                break;
+            case Type.B:
+                GameManager.instance.poolManager.SetPool(PoolFlag.enemyB, this.gameObject);
+                break;
+            case Type.C:
+                GameManager.instance.poolManager.SetPool(PoolFlag.enemyC, this.gameObject);
+                break;
+            case Type.D:
+                GameManager.instance.poolManager.SetPool(PoolFlag.enemyD, this.gameObject);
+                break;
         }
     }
 
@@ -206,8 +236,10 @@ public class Enemy : MonoBehaviour
                 break;
             case Type.C:
                 yield return new WaitForSeconds(0.5f);
-                GameObject InstantBullet = Instantiate(bullet, this.transform.position, this.transform.rotation);
-                Rigidbody rigidBullet = InstantBullet.GetComponent<Rigidbody>();
+                GameObject instantBullet = GameManager.instance.poolManager.GetPool(PoolFlag.enemyCMissile);
+                instantBullet.transform.position = this.transform.position;
+                instantBullet.transform.rotation = this.transform.rotation;
+                Rigidbody rigidBullet = instantBullet.GetComponent<Rigidbody>();
                 rigidBullet.velocity = this.transform.forward * 20f;
 
                 yield return new WaitForSeconds(2f);

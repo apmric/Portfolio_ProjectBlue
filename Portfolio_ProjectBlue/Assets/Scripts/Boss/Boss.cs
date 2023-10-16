@@ -26,6 +26,11 @@ public class Boss : Enemy
         StartCoroutine(Think());
     }
 
+    void OnEnable()
+    {
+        StartCoroutine(Think());
+    }
+
     void Update()
     {
         if (isDead)
@@ -74,12 +79,17 @@ public class Boss : Enemy
     {
         anim.SetTrigger("doShot");
         yield return new WaitForSeconds(0.2f);
-        GameObject instantMissileA = Instantiate(missile, missilePortA.position, missilePortA.rotation);
+        //GameObject instantMissileA = Instantiate(missile, missilePortA.position, missilePortA.rotation);
+        GameObject instantMissileA = GameManager.instance.poolManager.GetPool(PoolFlag.bossMissile);
+        instantMissileA.transform.position = missilePortA.position;
+        instantMissileA.transform.rotation = missilePortA.rotation;
         BossMissile bossMissileA = instantMissileA.GetComponent<BossMissile>();
         bossMissileA.target = target;
 
         yield return new WaitForSeconds(0.3f);
-        GameObject instantMissileB = Instantiate(missile, missilePortB.position, missilePortB.rotation);
+        GameObject instantMissileB = GameManager.instance.poolManager.GetPool(PoolFlag.bossMissile);
+        instantMissileB.transform.position = missilePortB.position;
+        instantMissileB.transform.rotation = missilePortB.rotation;
         BossMissile bossMissileB = instantMissileB.GetComponent<BossMissile>();
         bossMissileB.target = target;
 
@@ -92,7 +102,9 @@ public class Boss : Enemy
     {
         isLook = false;
         anim.SetTrigger("doBigShot");
-        Instantiate(bullet, this.transform.position, this.transform.rotation);
+        GameObject instantRock = GameManager.instance.poolManager.GetPool(PoolFlag.bossRock);
+        instantRock.transform.position = this.transform.position;
+        instantRock.transform.rotation = this.transform.rotation;
         yield return new WaitForSeconds(3f);
 
         isLook = true;

@@ -39,7 +39,6 @@ public class Player : MonoBehaviour
     float hAxis;
     float vAxis;
 
-    protected bool wDown;
     protected bool fDown;
     protected bool s1Down;
     protected bool s2Down;
@@ -62,7 +61,6 @@ public class Player : MonoBehaviour
     protected SkinnedMeshRenderer[] meshs;
     protected Transform[] transforms;
 
-    // Start is called before the first frame update
     protected virtual void Awake()
     {
         rigid = GetComponent<Rigidbody>();
@@ -87,7 +85,6 @@ public class Player : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     protected virtual void Update()
     {
         GetInput();
@@ -136,7 +133,7 @@ public class Player : MonoBehaviour
             moveVec = Vector3.zero;
         }
 
-        transform.position += moveVec * speed * (wDown ? 0.3f : 1f) * Time.deltaTime;
+        transform.position += moveVec * speed * (isReload ? 0.3f : 1f) * Time.deltaTime;
 
         anim.SetBool("isRun", moveVec != Vector3.zero);
     }
@@ -289,7 +286,7 @@ public class Player : MonoBehaviour
         }
 
         if (other.GetComponent<Rigidbody>() != null)
-            Destroy(other.gameObject);
+                GameManager.instance.poolManager.SetPool(PoolFlag.enemyCMissile, other.gameObject);
     }
 
     IEnumerator OnDamage(bool isBossAtk)

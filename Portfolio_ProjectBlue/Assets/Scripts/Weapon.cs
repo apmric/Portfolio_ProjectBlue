@@ -20,7 +20,7 @@ public class Weapon : MonoBehaviour
         if (currentAmmo > 0)
         {
             currentAmmo--;
-            StartCoroutine("Shot");
+            StartCoroutine(Shot());
         }
     }
 
@@ -29,14 +29,18 @@ public class Weapon : MonoBehaviour
         yield return new WaitForSeconds(0.01f);
 
         // √—æÀ πﬂªÁ
-        GameObject instantBullet = Instantiate(bullet, bulletPos.position, bulletPos.rotation);
+        GameObject instantBullet = GameManager.instance.poolManager.GetPool(PoolFlag.bullet);
+        instantBullet.transform.position = bulletPos.position;
+        instantBullet.transform.rotation = bulletPos.rotation;
         Rigidbody bulletRigid = instantBullet.GetComponent<Rigidbody>();
         bulletRigid.velocity = bulletPos.forward * 50f;
 
         yield return null;
 
         // ≈∫«« πË√‚
-        GameObject instantBulletCase = Instantiate(bulletCase, bulletCasePos.position, bulletCasePos.rotation);
+        GameObject instantBulletCase = GameManager.instance.poolManager.GetPool(PoolFlag.bulletCase);
+        instantBulletCase.transform.position = bulletCasePos.position;
+        instantBulletCase.transform.rotation = bulletCasePos.rotation;
         Rigidbody bulletCaseRigid = instantBullet.GetComponent<Rigidbody>();
         Vector3 caseVec = bulletCasePos.forward * Random.Range(-3, -2) + Vector3.up * Random.Range(2, 3);
         bulletCaseRigid.AddForce(caseVec, ForceMode.Impulse);
