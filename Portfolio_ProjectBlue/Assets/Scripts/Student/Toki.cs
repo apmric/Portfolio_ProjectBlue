@@ -123,7 +123,7 @@ public class Toki : Player
         {
             Debug.Log(isSkill);
             equipWeapon.Use();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.2f);
         }
     }
 }
