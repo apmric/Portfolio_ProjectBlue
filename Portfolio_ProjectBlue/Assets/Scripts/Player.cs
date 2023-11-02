@@ -80,11 +80,11 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        for (int i = 0; i < 2; i++)
-        {
-            skills[i].coolTimeImage = skillCoolTimeImgs[i];
-            skills[i].coolTimeUI = skillCoolTimeUIs[i];
-        }
+        //for (int i = 0; i < 2; i++)
+        //{
+        //    skills[i].coolTimeImage = skillCoolTimeImgs[i];
+        //    skills[i].coolTimeUI = skillCoolTimeUIs[i];
+        //}
     }
 
     protected virtual void Update()
@@ -93,18 +93,17 @@ public class Player : MonoBehaviour
         Move();
         Dodge();
         Turn();
-        Attack();
         SkillQ();
         SkillE();
         Reload();
 
-        for (int i = 0; i < 2; i++)
-        {
-            if (!skills[i].isOn)
-            {
-                skills[i].remainTime -= Time.deltaTime; // 프레임과 프레임 사이 걸린 시간
-            }
-        }
+        //for (int i = 0; i < 2; i++)
+        //{
+        //    if (!skills[i].isOn)
+        //    {
+        //        skills[i].remainTime -= Time.deltaTime; // 프레임과 프레임 사이 걸린 시간
+        //    }
+        //}
     }
 
     void FixedUpdate()
@@ -146,7 +145,7 @@ public class Player : MonoBehaviour
         this.transform.LookAt(this.transform.position + moveVec);
 
         // 마우스에 의한 회전
-        if(fDown && equipWeapon.currentAmmo > 0 && !isDead && !isShop)
+        if(fDown && !isDead && !isShop)
         {
             Ray ray = followCamera.ScreenPointToRay(Input.mousePosition);
 
@@ -181,33 +180,19 @@ public class Player : MonoBehaviour
         isDodge = false;
     }
 
-    void Attack()
-    {
-        fireDelay += Time.deltaTime;
-        isFireReady = equipWeapon.rate < fireDelay;
-
-        if (fDown && isFireReady && equipWeapon.currentAmmo > 0 && !isSkill && !isDead && !isShop)
-        {
-            equipWeapon.Use();
-            shotSound.Play();
-            anim.SetTrigger("doShot");
-            fireDelay = 0;
-        }
-    }
-
     protected virtual void SkillQ()
     {
-        if (ulGauge < ulMaxGauge)
-        {
-            GameManager.instance.ultimateBar.localScale = new Vector3(1, (float)(ulGauge / ulMaxGauge), 1);
-        }
+        //if (ulGauge < ulMaxGauge)
+        //{
+        //    GameManager.instance.ultimateBar.localScale = new Vector3(1, (float)(ulGauge / ulMaxGauge), 1);
+        //}
 
-        if (ulGauge >= ulMaxGauge)
-        {
-            isUltimateReady = true;
-            ulGauge = 100f;
-            GameManager.instance.ultimateBar.localScale = new Vector3(1, 1, 1);
-        }
+        //if (ulGauge >= ulMaxGauge)
+        //{
+        //    isUltimateReady = true;
+        //    ulGauge = 100f;
+        //    GameManager.instance.ultimateBar.localScale = new Vector3(1, 1, 1);
+        //}
     }
 
     protected virtual void SkillE()

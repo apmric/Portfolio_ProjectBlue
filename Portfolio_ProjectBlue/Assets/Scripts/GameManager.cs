@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     public GameObject gameCam;
 
     [Header("# Player")]
-    public GameObject[] studentPrefabs;
+    public GameObject[] characterPrefabs;
     public Player player;
     public Transform respown;
 
@@ -43,7 +43,6 @@ public class GameManager : MonoBehaviour
 
     [Header("# Panel")]
     public GameObject menuPanel;
-    public GameObject studentPanel;
     public GameObject gamePanel;
     public GameObject overPanel;
     public GameObject clearPanel;
@@ -66,10 +65,6 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI curScoreText;
     public TextMeshProUGUI bestScoreText;
 
-    [Header("# Sound")]
-    public AudioSource menuSound;
-    public AudioSource backGroundSound;
-
     void Awake()
     {
         instance = this;
@@ -82,8 +77,11 @@ public class GameManager : MonoBehaviour
 
     public void GameStart()
     {
+        menuCam.SetActive(false);
+        gameCam.SetActive(true);
         menuPanel.SetActive(false);
-        studentPanel.SetActive(true);
+        gamePanel.SetActive(true);
+        player.gameObject.SetActive(true);
     }
 
     public void GameOver()
@@ -103,42 +101,6 @@ public class GameManager : MonoBehaviour
     public void Restart()
     {
         SceneManager.LoadScene(0);
-    }
-
-    public void ChoiceStudent(int student)
-    {
-        switch (student)
-        {
-            case 0:
-                player = Instantiate(studentPrefabs[0]).GetComponent<Player>();
-                player.transform.position = respown.position;
-                break;
-            //case 1:
-            //    player = Instantiate(studentPrefabs[1]).GetComponent<Player>();
-            //    player.transform.position = respown.position;
-            //    break;
-            //case 2:
-            //    player = Instantiate(studentPrefabs[2]).GetComponent<Player>();
-            //    player.transform.position = respown.position;
-            //    break;
-            //case 3:
-            //    player = Instantiate(studentPrefabs[3]).GetComponent<Player>();
-            //    player.transform.position = respown.position;
-            //    break;
-            //case 4:
-            //    player = Instantiate(studentPrefabs[4]).GetComponent<Player>();
-            //    player.transform.position = respown.position;
-            //    break;
-        }
-
-        studentPanel.SetActive(false);
-        menuCam.SetActive(false);
-        gameCam.SetActive(true);
-        gamePanel.SetActive(true);
-        player.gameObject.SetActive(true);
-
-        menuSound.Stop();
-        backGroundSound.Play();
     }
 
     void Update()
@@ -163,7 +125,6 @@ public class GameManager : MonoBehaviour
         {
             scoreTxt.text = string.Format("{0:n0}", player.score);
             playerHealthTxt.text = player.currentHp.ToString() + "/" + player.maxHp.ToString();
-            playerAmmoTxt.text = player.equipWeapon.currentAmmo.ToString() + "/" + player.equipWeapon.maxAmmo.ToString();
             playerCoinTxt.text = string.Format("{0:n0}", player.coin);
         }
 
