@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     public float ulGauge;
     public float ulMaxGauge;
     public float speed;
+    public float jumpPower;
     public float dodgeTime;
     public Weapon equipWeapon;
     float fireDelay;
@@ -50,7 +51,7 @@ public class Player : MonoBehaviour
     protected bool isUltimateReady;
     protected bool isSkill;
     protected bool isReload;
-    protected bool isDodge;
+    protected bool isJump;
     protected bool isDamage;
     protected bool isDead;
     public bool isShop;
@@ -91,8 +92,8 @@ public class Player : MonoBehaviour
     {
         GetInput();
         Move();
-        Dodge();
         Turn();
+        Jump();
         SkillQ();
         SkillE();
         Reload();
@@ -126,9 +127,6 @@ public class Player : MonoBehaviour
     {
         moveVec = new Vector3(hAxis, 0, vAxis).normalized;
 
-        if (isDodge)
-            moveVec = dodgeVec;
-
         if (!isFireReady || isSkill || isDead || isShop)
         {
             moveVec = Vector3.zero;
@@ -159,25 +157,24 @@ public class Player : MonoBehaviour
         }
     }
 
-    void Dodge()
+    void Jump()
     {
-        if(jDown && moveVec != Vector3.zero && !isDodge && skills[0].isOn && !isDead && !isShop)
+        if (jDown && !isJump)
         {
-            UseSkill(0);
-
-            dodgeVec = moveVec;
-            speed *= 2;
-            anim.SetTrigger("doDodge");
-            isDodge = true;
-
-            Invoke("DodgeOut", 0.5f);
+            rigid.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+            anim.SetBool("isJump", true);
+            anim.SetTrigger("doJump");
+            isJump = true;
         }
     }
 
-    void DodgeOut()
+    void OnCollisionEnter(Collision collision)
     {
-        speed *= 0.5f;
-        isDodge = false;
+        if (collision.gameObject.CompareTag("Floor"))
+        {
+            anim.SetBool("isJump", false);
+            isJump = false;
+        }
     }
 
     protected virtual void SkillQ()
